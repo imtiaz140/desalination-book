@@ -19,6 +19,8 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Inter', sans-serif; background: #050505; color: #ffffff; overflow-x: hidden; }
+
+    /* Noise Texture */
     body::before {
       content: '';
       position: fixed;
@@ -28,6 +30,8 @@
       opacity: 0.03;
       background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
+
+    /* Gradient Text */
     .gradient-text {
       background: linear-gradient(to right, #818cf8, #c084fc, #38bdf8);
       -webkit-background-clip: text;
@@ -40,11 +44,15 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
+
+    /* Glass Panel */
     .glass-panel {
       background: rgba(255, 255, 255, 0.03);
       backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
+
+    /* Animations */
     @keyframes float {
       0%, 100% { transform: translateY(0px) rotate(0deg); }
       50% { transform: translateY(-20px) rotate(2deg); }
@@ -56,6 +64,15 @@
     @keyframes twinkle {
       0%, 100% { opacity: 0.2; transform: scale(1); }
       50% { opacity: 0.8; transform: scale(1.5); }
+    }
+    @keyframes scan-beam {
+      0% { left: -20%; opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { left: 120%; opacity: 0; }
+    }
+    @keyframes dash-flow {
+      to { stroke-dashoffset: -20; }
     }
     @keyframes wave-move {
       0% { transform: translateX(0); }
@@ -69,13 +86,19 @@
       from { opacity: 0; }
       to { opacity: 1; }
     }
-    @keyframes rotate { to { transform: rotate(360deg); } }
+    @keyframes count-pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
     .animate-float { animation: float 10s ease-in-out infinite; }
     .animate-pulse-glow { animation: pulse-glow 8s ease-in-out infinite; }
     .animate-twinkle { animation: twinkle 4s ease-in-out infinite; }
     .animate-slide-up { animation: slide-up 0.8s cubic-bezier(0.5, 0, 0, 1) forwards; }
     .animate-fade-in { animation: fade-in 1s ease forwards; }
     .animate-wave { animation: wave-move 8s linear infinite; }
+
+    /* Spotlight */
     #spotlight {
       position: fixed;
       inset: 0;
@@ -83,18 +106,28 @@
       pointer-events: none;
       background: radial-gradient(circle 600px at var(--x, 50%) var(--y, 50%), rgba(99,102,241,0.05), transparent 80%);
     }
+
+    /* Reveal on Scroll */
     .reveal {
       opacity: 0;
       transform: translateY(30px);
       transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
     }
-    .reveal.active { opacity: 1; transform: translateY(0); }
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
     .reveal-card {
       opacity: 0;
       transform: perspective(1000px) rotateX(20deg) translateY(60px) scale(0.95);
       transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
-    .reveal-card.active { opacity: 1; transform: perspective(1000px) rotateX(0deg) translateY(0) scale(1); }
+    .reveal-card.active {
+      opacity: 1;
+      transform: perspective(1000px) rotateX(0deg) translateY(0) scale(1);
+    }
+
+    /* Book Cover Styles */
     .book-cover {
       background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 40%, #312e81 70%, #1e3a5f 100%);
       box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(99,102,241,0.15), inset 0 1px 0 rgba(255,255,255,0.1);
@@ -104,11 +137,14 @@
     .book-cover::before {
       content: '';
       position: absolute;
-      top: -50%; left: -50%;
-      width: 200%; height: 200%;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
       background: conic-gradient(from 0deg, transparent 0deg, rgba(99,102,241,0.08) 60deg, transparent 120deg);
       animation: rotate 20s linear infinite;
     }
+    @keyframes rotate { to { transform: rotate(360deg); } }
     .book-cover::after {
       content: '';
       position: absolute;
@@ -117,25 +153,46 @@
     }
     .book-spine {
       position: absolute;
-      left: 0; top: 0; bottom: 0;
+      left: 0;
+      top: 0;
+      bottom: 0;
       width: 16px;
       background: linear-gradient(to right, rgba(0,0,0,0.5), rgba(0,0,0,0.1), rgba(255,255,255,0.05));
     }
-    .topic-card { transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+
+    /* Topic Card Hover */
+    .topic-card {
+      transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
     .topic-card:hover {
       transform: translateY(-8px);
       box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1);
     }
-    .topic-card:hover .topic-icon { transform: scale(1.1); }
-    .topic-card:hover .topic-number { color: #818cf8; }
-    .topic-icon { transition: transform 0.5s ease; }
-    .topic-number { transition: color 0.5s ease; }
+    .topic-card:hover .topic-icon {
+      transform: scale(1.1);
+    }
+    .topic-card:hover .topic-number {
+      color: #818cf8;
+    }
+    .topic-icon {
+      transition: transform 0.5s ease;
+    }
+    .topic-number {
+      transition: color 0.5s ease;
+    }
+
+    /* Timeline */
     .timeline-line {
       background: linear-gradient(to bottom, transparent, rgba(99,102,241,0.5), rgba(168,85,247,0.5), transparent);
     }
-    .timeline-dot { box-shadow: 0 0 10px rgba(99,102,241,0.8); }
+    .timeline-dot {
+      box-shadow: 0 0 10px rgba(99,102,241,0.8);
+    }
+
+    /* CTA Button */
     .cta-btn {
-      background: #ffffff; color: #000000;
+      background: #ffffff;
+      color: #000000;
       transition: all 0.3s ease;
       box-shadow: 0 0 20px rgba(255,255,255,0.1);
     }
@@ -154,54 +211,91 @@
       background: rgba(255,255,255,0.05);
       transform: translateY(-2px);
     }
+
+    /* Wave decoration */
+    .wave-container {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 120px;
+      overflow: hidden;
+      opacity: 0.1;
+    }
+
+    /* Part badge */
     .part-badge {
       background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(168,85,247,0.15));
       border: 1px solid rgba(99,102,241,0.3);
     }
+
+    /* Submission requirement item */
     .req-item {
       border-left: 2px solid rgba(99,102,241,0.3);
       transition: border-color 0.3s ease;
     }
-    .req-item:hover { border-left-color: rgba(99,102,241,0.8); }
+    .req-item:hover {
+      border-left-color: rgba(99,102,241,0.8);
+    }
+
+    /* Scrollbar */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: #050505; }
     ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+    /* Grid bg */
     .grid-bg {
       background-size: 40px 40px;
       background-image:
         linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
         linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
     }
+
+    /* Elsevier badge */
     .elsevier-badge {
       background: linear-gradient(135deg, #ff6b00, #ff8c00);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
+
+    /* Toast notification */
     .toast {
       position: fixed;
-      bottom: 24px; right: 24px;
+      bottom: 24px;
+      right: 24px;
       z-index: 1000;
       transform: translateY(100px);
       opacity: 0;
       transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
-    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Responsive book */
     @media (max-width: 768px) {
-      .book-cover-wrapper { transform: scale(0.85); }
+      .book-cover-wrapper {
+        transform: scale(0.85);
+      }
     }
   </style>
 </head>
 <body class="font-inter">
 
+  <!-- Spotlight -->
   <div id="spotlight"></div>
 
+  <!-- Background Orbs -->
   <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
     <div class="absolute top-1/4 -left-32 w-96 h-96 rounded-full bg-indigo-600/20 animate-pulse-glow"></div>
-    <div class="absolute top-2/3 right-0 w-80 h-80 rounded-full bg-purple-600/15 animate-pulse-glow" style="animation-delay:3s;"></div>
-    <div class="absolute bottom-1/4 left-1/3 w-72 h-72 rounded-full bg-cyan-500/10 animate-pulse-glow" style="animation-delay:5s;"></div>
+    <div class="absolute top-2/3 right-0 w-80 h-80 rounded-full bg-purple-600/15 animate-pulse-glow" style="animation-delay: 3s;"></div>
+    <div class="absolute bottom-1/4 left-1/3 w-72 h-72 rounded-full bg-cyan-500/10 animate-pulse-glow" style="animation-delay: 5s;"></div>
   </div>
 
+  <!-- Stars -->
   <div class="fixed inset-0 z-0 pointer-events-none">
     <div class="absolute w-1 h-1 bg-white rounded-full animate-twinkle" style="top:12%;left:20%;"></div>
     <div class="absolute w-0.5 h-0.5 bg-indigo-400 rounded-full animate-twinkle" style="top:25%;left:75%;animation-delay:1s;"></div>
@@ -212,9 +306,9 @@
     <div class="absolute w-1 h-1 bg-indigo-300 rounded-full animate-twinkle" style="top:70%;left:30%;animation-delay:2.5s;"></div>
   </div>
 
-  <!-- Nav -->
+  <!-- Navigation -->
   <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-4xl">
-    <div class="glass-panel rounded-full px-6 py-3 flex items-center justify-between" style="box-shadow:0 0 20px rgba(0,0,0,0.3);">
+    <div class="glass-panel rounded-full px-6 py-3 flex items-center justify-between" style="box-shadow: 0 0 20px rgba(0,0,0,0.3);">
       <div class="flex items-center gap-2">
         <iconify-icon icon="mdi:water" class="text-indigo-400 text-xl"></iconify-icon>
         <span class="text-sm font-semibold tracking-tight">SCDS Book</span>
@@ -229,9 +323,10 @@
     </div>
   </nav>
 
-  <!-- Hero -->
+  <!-- Hero Section -->
   <section class="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 pt-32 pb-20 grid-bg">
-    <div class="animate-slide-up mb-8" style="animation-delay:0.1s;">
+    <!-- Urgent Badge -->
+    <div class="animate-slide-up mb-8" style="animation-delay: 0.1s;">
       <div class="inline-flex items-center gap-2 glass-panel rounded-full px-4 py-2">
         <span class="relative flex h-2 w-2">
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -241,7 +336,8 @@
       </div>
     </div>
 
-    <div class="text-center max-w-5xl mx-auto animate-slide-up" style="animation-delay:0.2s;">
+    <!-- Main Title -->
+    <div class="text-center max-w-5xl mx-auto animate-slide-up" style="animation-delay: 0.2s;">
       <h1 class="text-4xl md:text-6xl lg:text-7xl font-semibold leading-[1.05] tracking-tighter mb-6">
         <span class="gradient-text-2">Smart and Circular</span><br/>
         <span class="gradient-text">Desalination Systems</span>
@@ -254,7 +350,9 @@
       </p>
     </div>
 
-    <div class="flex flex-col lg:flex-row items-center gap-12 mt-16 w-full max-w-6xl animate-slide-up" style="animation-delay:0.4s;">
+    <!-- Book Cover + Info -->
+    <div class="flex flex-col lg:flex-row items-center gap-12 mt-16 w-full max-w-6xl animate-slide-up" style="animation-delay: 0.4s;">
+      <!-- Book Cover Mockup -->
       <div class="book-cover-wrapper flex-shrink-0 animate-float">
         <div class="book-cover rounded-xl w-[260px] md:w-[300px] h-[400px] md:h-[440px] relative p-8 flex flex-col justify-between">
           <div class="book-spine rounded-l-xl"></div>
@@ -266,8 +364,12 @@
             <div class="w-12 h-px bg-gradient-to-r from-indigo-400 to-transparent mb-4"></div>
           </div>
           <div class="relative z-10 flex-1 flex flex-col justify-center">
-            <h3 class="text-lg md:text-xl font-semibold leading-tight tracking-tight text-white mb-3">Smart and Circular Desalination Systems</h3>
-            <p class="text-xs font-light text-indigo-200/60 leading-relaxed">Digital Innovation, Renewable Integration, and Resource Recovery</p>
+            <h3 class="text-lg md:text-xl font-semibold leading-tight tracking-tight text-white mb-3">
+              Smart and Circular Desalination Systems
+            </h3>
+            <p class="text-xs font-light text-indigo-200/60 leading-relaxed">
+              Digital Innovation, Renewable Integration, and Resource Recovery
+            </p>
           </div>
           <div class="relative z-10">
             <div class="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mb-4"></div>
@@ -281,6 +383,7 @@
               </div>
             </div>
           </div>
+          <!-- Water wave decoration -->
           <div class="absolute bottom-0 left-0 right-0 h-16 overflow-hidden opacity-20">
             <svg class="animate-wave" width="200%" height="60" viewBox="0 0 600 60" preserveAspectRatio="none">
               <path d="M0,30 Q75,0 150,30 T300,30 T450,30 T600,30" fill="none" stroke="rgba(129,140,248,0.5)" stroke-width="1"/>
@@ -290,6 +393,7 @@
         </div>
       </div>
 
+      <!-- Key Info Cards -->
       <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
         <div class="glass-panel rounded-2xl p-6 topic-card">
           <div class="flex items-center gap-3 mb-3">
@@ -334,7 +438,8 @@
       </div>
     </div>
 
-    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-fade-in" style="animation-delay:1.5s;">
+    <!-- Scroll indicator -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-fade-in" style="animation-delay: 1.5s;">
       <span class="text-[10px] text-neutral-600 tracking-widest uppercase">Scroll</span>
       <div class="w-5 h-8 rounded-full border border-white/10 flex items-start justify-center p-1.5">
         <div class="w-1 h-2 bg-white/30 rounded-full animate-bounce"></div>
@@ -342,21 +447,27 @@
     </div>
   </section>
 
-  <!-- Topics -->
+  <!-- Topics Section -->
   <section id="topics" class="relative z-10 px-6 py-24">
     <div class="max-w-6xl mx-auto">
       <div class="text-center mb-16 reveal">
         <span class="inline-flex items-center gap-2 part-badge rounded-full px-4 py-1.5 text-xs font-medium text-indigo-300 mb-6">
-          <iconify-icon icon="mdi:lightbulb-on" class="text-sm"></iconify-icon> EMERGING AREAS
+          <iconify-icon icon="mdi:lightbulb-on" class="text-sm"></iconify-icon>
+          EMERGING AREAS
         </span>
         <h2 class="text-3xl md:text-4xl font-semibold tracking-tight mb-4 gradient-text-2">Chapter Topics</h2>
-        <p class="text-sm font-light text-neutral-400 max-w-xl mx-auto leading-relaxed">We invite contributions across six cutting-edge thematic areas shaping the future of sustainable desalination.</p>
+        <p class="text-sm font-light text-neutral-400 max-w-xl mx-auto leading-relaxed">
+          We invite contributions across six cutting-edge thematic areas shaping the future of sustainable desalination.
+        </p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div class="reveal-card glass-panel rounded-2xl p-7 topic-card group" style="transition-delay:0.05s;">
+        <!-- Topic 1 -->
+        <div class="reveal-card glass-panel rounded-2xl p-7 topic-card group" style="transition-delay: 0.05s;">
           <div class="flex items-start justify-between mb-5">
-            <div class="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center topic-icon"><iconify-icon icon="mdi:brain" class="text-indigo-400 text-2xl"></iconify-icon></div>
+            <div class="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center topic-icon">
+              <iconify-icon icon="mdi:brain" class="text-indigo-400 text-2xl"></iconify-icon>
+            </div>
             <span class="text-xs font-semibold text-neutral-600 topic-number">01</span>
           </div>
           <h3 class="text-base font-semibold tracking-tight text-white mb-2">AI & Machine Learning in Water Systems</h3>
@@ -368,6 +479,605 @@
           </div>
         </div>
 
-        <div class="reveal-card glass-panel rounded-2xl p-7 topic-card group" style="transition-delay:0.1s;">
+        <!-- Topic 2 -->
+        <div class="reveal-card glass-panel rounded-2xl p-7 topic-card group" style="transition-delay: 0.1s;">
           <div class="flex items-start justify-between mb-5">
-            <div class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center topic-icon"><iconify
+            <div class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center topic-icon">
+              <iconify-icon icon="mdi:monitor-screenshot" class="text-purple-400 text-2xl"></iconify-icon>
+            </div>
+            <span class="text-xs font-semibold text-neutral-600 topic-number">02</span>
+          </div>
+          <h3 class="text-base font-semibold tracking-tight text-white mb-2">Digital Twins & Smart Monitoring</h3>
+          <p class="text-xs font-light text-neutral-500 leading-relaxed">Virtual replicas of desalination plants, real-time IoT-based monitoring, fault detection, and predictive maintenance frameworks.</p>
+          <div class="mt-5 flex flex-wrap gap-2">
+            <span class="text-[10px] px-2 py-1 rounded-full bg-purple-500/10 text-purple-300/70">IoT Sensors</span>
+            <span class="text-[10px] px-2 py-1 rounded-full bg-purple-500/10 text-purple-300/70">Digital Twins</span>
+            <span class="text-[10px] px-2 py-1 rounded-full bg-purple-500/10 text-purple-300/70">Real-time Data</span>
+          </div>
+        </div>
+
+        <!-- Topic 3 -->
+        <div class="reveal-card glass-panel rounded-2xl p-7 topic-card group" style="transition-delay: 0.15s;">
+          <div class="flex items-start justify-between mb-5">
+            <div class="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center topic-icon">
+              <iconify-icon icon="mdi:solar-power-variant" class="text-cyan-400 text-2xl"></iconify-icon>
+            </div>
+            <span class="text-xs font-semibold text-neutral-600 topic-number">03</span>
+          </div>
+          <h3 class="text-base font-semibold tracking-tight text-white mb-2">Renewable Energy Powered Desalination</h3>
+          <p class="text-xs font-light text-neutral-500 leading-relaxed">Solar, wind, and geothermal integration with RO, MD, and ED systems; hybrid renewable-desalination configurations and grid interactions.</p>
+          <div class="mt-5 flex flex-wrap gap-2">
+            <span class="text-[10px] px-2 py-1 rounded-full bg-cyan-500/10 text-cyan-300/70">Solar PV</span>
+            <span class="text-[10px] px-2 py-1 rounded-full bg-cyan-500/10 text-cyan-300/70">Wind Energy</span>
+            <span class="text-[10px] px-2 py-1 rounded-full bg-cyan-500/10 text-cyan-300/70">Hybrid Systems</span>
+          </div>
+        </div>
+
+        <!-- Topic 4 -->
+        <div class="reveal-card glass-panel rounded-2xl p-7 topic-card group" style="transition-delay: 0.2s;">
+          <div class="flex items-start justify-between mb-5">
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center topic-icon">
+              <iconify-icon icon="mdi:recycle-variant" class="text-emerald-400 text-2xl"></iconify-icon>
+            </div>
+            <span class="text-xs font-semibold text-neutral-600 topic-number">04</span>
+          </div>
+          <h3 class="text-base font-semibold tracking-tight text-white mb-2">Circular Economy & Resource Recovery</h3>
+          <p class="text-xs font-light text-neutral-500 leading-relaxed">Brine valorization, mineral extraction, zero liquid discharge (ZLD), and closed-loop water-energy-nutrient systems.</p>
+          <div class="mt-5 flex flex-wrap gap-2">
+            <span class="text-[10px] px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-300/70">Brine Mining</span>
+            <span class="text-[10px] px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-300/70">ZLD</span>
+            <span class="text-[10px] px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-300/70">Circular Design</span>
+          </div>
+        </div>
+
+        <!-- Topic 5 -->
+        <div class="reveal-card glass-panel rounded-2xl p-7 topic-card group" style="transition-delay: 0.25s;">
+          <div class="flex items-start justify-between mb-5">
+            <div class="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center topic-icon">
+              <iconify-icon icon="mdi:filter-outline" class="text-amber-400 text-2xl"></iconify-icon>
+            </div>
+            <span class="text-xs font-semibold text-neutral-600 topic-number">05</span>
+          </div>
+          <h3 class="text-base font-semibold tracking-tight text-white mb-2">Advanced Membrane & Hybrid Processes</h3>
+          <p class="text-xs font-light text-neutral-500 leading-relaxed">Nanomaterial-enhanced membranes, forward/reverse osmosis, membrane distillation, electrodialysis, and hybrid process intensification.</p>
+          <div class="mt-5 flex flex-wrap gap-2">
+            <span class="text-[10px] px-2 py-1 rounded-full bg-amber-500/10 text-amber-300/70">Nanomembranes</span>
+            <span class="text-[10px] px-2 py-1 rounded-full bg-amber-500/10 text-amber-300/70">FO/RO/MD</span>
+            <span class="text-[10px] px-2 py-1 rounded-full bg-amber-500/10 text-amber-300/70">Hybrid</span>
+          </div>
+        </div>
+
+        <!-- Topic 6 -->
+        <div class="reveal-card glass-panel rounded-2xl p-7 topic-card group" style="transition-delay: 0.3s;">
+          <div class="flex items-start justify-between mb-5">
+            <div class="w-12 h-12 rounded-xl bg-rose-500/10 flex items-center justify-center topic-icon">
+              <iconify-icon icon="mdi:chart-areaspline" class="text-rose-400 text-2xl"></iconify-icon>
+            </div>
+            <span class="text-xs font-semibold text-neutral-600 topic-number">06</span>
+          </div>
+          <h3 class="text-base font-semibold tracking-tight text-white mb-2">Techno-economic & Sustainability Assessment</h3>
+          <p class="text-xs font-light text-neutral-500 leading-relaxed">Life cycle assessment (LCA), exergy analysis, cost modeling, carbon footprint evaluation, and policy frameworks for sustainable desalination.</p>
+          <div class="mt-5 flex flex-wrap gap-2">
+            <span class="text-[10px] px-2 py-1 rounded-full bg-rose-500/10 text-rose-300/70">LCA</span>
+            <span class="text-[10px] px-2 py-1 rounded-full bg-rose-500/10 text-rose-300/70">Exergy</span>
+            <span class="text-[10px] px-2 py-1 rounded-full bg-rose-500/10 text-rose-300/70">Cost Modeling</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Part Structure Section (similar to the chemical engineering scheme) -->
+  <section class="relative z-10 px-6 py-24">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-16 reveal">
+        <span class="inline-flex items-center gap-2 part-badge rounded-full px-4 py-1.5 text-xs font-medium text-indigo-300 mb-6">
+          <iconify-icon icon="mdi:format-list-numbered" class="text-sm"></iconify-icon>
+          BOOK STRUCTURE
+        </span>
+        <h2 class="text-3xl md:text-4xl font-semibold tracking-tight mb-4 gradient-text-2">Proposed Parts & Chapters</h2>
+        <p class="text-sm font-light text-neutral-400 max-w-xl mx-auto leading-relaxed">
+          The volume is organized into six thematic parts, each containing contributed chapters.
+        </p>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Part I -->
+        <div class="reveal-card glass-panel rounded-2xl overflow-hidden" style="transition-delay: 0.05s;">
+          <div class="p-6 md:p-8">
+            <div class="flex items-center gap-4 mb-4">
+              <span class="part-badge rounded-lg px-3 py-1.5 text-xs font-semibold text-indigo-300">PART I</span>
+              <h3 class="text-base font-semibold tracking-tight text-white">Foundations of Smart Desalination</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pl-1">
+              <div class="flex items-center gap-2 text-xs text-neutral-400"><iconify-icon icon="mdi:circle-small" class="text-indigo-400"></iconify-icon>Ch 1: Introduction to Intelligent Desalination</div>
+              <div class="flex items-center gap-2 text-xs text-neutral-400"><iconify-icon icon="mdi:circle-small" class="text-indigo-400"></iconify-icon>Ch 2: Evolution of Desalination Technologies</div>
+              <div class="flex items-center gap-2 text-xs text-neutral-400"><iconify-icon icon="mdi:circle-small" class="text-indigo-400"></iconify-icon>Ch 3: Water-Energy Nexus Fundamentals</div>
+              <div class="flex items-center gap-2 text-xs text-neutral-400"><iconify-icon icon="mdi:circle-small" class="text-indigo-400"></iconify-icon>Ch 4: Sustainability Frameworks for Desalination</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Part II -->
+        <div class="reveal-card glass-panel rounded-2xl overflow-hidden" style="transition-delay: 0.1s;">
+          <div class="p-6 md:p-8">
+            <div class="flex items-center gap-4 mb-4">
+              <span class="part-badge rounded-lg px-3 py-1.5 text-xs font-semibold text-indigo-300">PART II</span>
+              <h3 class="text-base font-semibold tracking-tight text-white">Advanced Membrane & Hybrid Processes</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pl-1">
+              <div class="flex items-center gap-2 text-xs text-neutral-400"><iconify-icon icon="mdi:circle-small" class="text-purple-400"></iconify-icon>Ch 5: Next-Generation RO Membranes</div>
+              <div class="flex items-center gap-2 text-xs text-neutral-400"><iconify-icon icon="mdi:circle-small" class="text-purple-400"></iconify-icon>Ch 6: Membrane Distillation Innovations</div>
+              <div class="flex items-center gap-2 text-xs text-neutral-400"><iconify-icon icon="mdi:circle-small" class="text-purple-400"></iconify-icon>Ch 7: Forward Osmosis & Hybrid Systems</div>
+              <div class="flex items-center gap-2 text-xs text-neutral-400"><iconify-icon icon="mdi:circle-small" class="text-purple-400"></iconify-icon>Ch 8: Electrodialysis & Capacitive Deionization</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Part III -->
+        <div class="reveal-card glass-panel rounded-2xl overflow-hidden" style="transition-delay: 0.15s;">
+          <div class="p-6 md:p-8">
+            <div class="flex items-center gap-4 mb-4">
+              <span class="part-badge rounded-lg px-3 py-1.5 text-xs font-semibold text-indigo-300">PART III</span>
+              <h3 class="text-base font-semibold tracking-tight text-white">Renewable Energy Integration</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pl-1">
+              <div class="flex items-center gap-2 text-xs text-neutral-400"><iconify-icon icon="mdi:circle-small" class="text-cyan-400"></iconify-icon>Ch 9: Solar-Powered Desalination Systems</div>
+              <div class="flex items-center gap-2 text-xs text-neutral-400"><iconify-icon icon="mdi:circle-small" class="text-cyan-400"></iconify-icon>Ch 10: Wind & Geothermal Integration</div>
+              <div class="flex items-center gap-2 text-xs text-neutral-400"><iconify-icon icon="mdi:circle-small" class="text-cyan-400"></iconify-icon>Ch 11: Hybrid Renewable-Desalination Configurations</div>
+              <div class="flex items-center gap-2 text-xs text-neutral-400"><iconify-icon icon="mdi:circle-small" class="text-cyan-400"></iconify-icon>Ch 12: Energy Storage & Grid Interaction</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Part IV -->
+        <div class="reveal-card glass-panel rounded-2xl overflow-hidden" style="transition-delay: 0.2s;">
+          <div class="p-6 md:p-8">
+            <div class="flex items-center gap-4 mb-4">
+              <span class="part-badge rounded-lg px-3 py-1.5 text-xs font-semibold text-indigo-300">PART IV</span>
+              <h3 class="text-base font-semibold tracking-tight text-white">Digital Transformation & AI</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pl-1">
+              <div class="flex items-center gap-2 text-xs text-neutral-400"><iconify-icon icon="mdi:circle-small" class="text-emerald-400"></iconify-icon>Ch 13: AI/ML for Process Optimization</div>
+              <div class="flex items-center gap-2 text-xs text-neutral-400"><iconify-icon icon="mdi:circle-small" class="text-emerald-400"></iconify-icon>Ch 14: Digital Twins for Desalination Plants</div>
+              <div class="flex items-center gap-2 text-xs text-neutral-400"><iconify-icon icon="mdi:circle-small" class="text-emerald-400"></iconify-icon>Ch 15: IoT & Smart Sensor Networks</div>
+              <div class="flex items-center gap-2 text-xs text-neutral-400"><iconify-icon icon="mdi:circle-small" class="text-emerald-400"></iconify-icon>Ch 16: Big Data Analytics & Cloud Platforms</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Part V -->
+        <div class="reveal-card glass-panel rounded-2xl overflow-hidden" style="transition-delay: 0.25s;">
+          <div class="p-6 md:p-8">
+            <div class="flex items-center gap-4 mb-4">
+              <span class="part-badge rounded-lg px-3 py-1.5 text-xs font-semibold text-indigo-300">PART V</span>
+              <h3 class="text-base font-semibold tracking-tight text-white">Circular Economy & Resource Recovery</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pl-1">
+              <div class="flex items-center gap-2 text-xs text-neutral-400"><iconify-icon icon="mdi:circle-small" class="text-amber-400"></iconify-icon>Ch 17: Brine Valorization & Mineral Extraction</div>
+              <div class="flex items-center gap-2 text-xs text-neutral-400"><iconify-icon icon="mdi:circle-small" class="text-amber-400"></iconify-icon>Ch 18: Zero Liquid Discharge Strategies</div>
+              <div class="flex items-center gap-2 text-xs text-neutral-400"><iconify-icon icon="mdi:circle-small" class="text-amber-400"></iconify-icon>Ch 19: Closed-Loop Water-Energy Systems</div>
+              <div class="flex items-center gap-2 text-xs text-neutral-400"><iconify-icon icon="mdi:circle-small" class="text-amber-400"></iconify-icon>Ch 20: Nutrient Recovery from Desalination Brine</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Part VI -->
+        <div class="reveal-card glass-panel rounded-2xl overflow-hidden" style="transition-delay: 0.3s;">
+          <div class="p-6 md:p-8">
+            <div class="flex items-center gap-4 mb-4">
+              <span class="part-badge rounded-lg px-3 py-1.5 text-xs font-semibold text-indigo-300">PART VI</span>
+              <h3 class="text-base font-semibold tracking-tight text-white">Assessment, Policy & Future Outlook</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pl-1">
+              <div class="flex items-center gap-2 text-xs text-neutral-400"><iconify-icon icon="mdi:circle-small" class="text-rose-400"></iconify-icon>Ch 21: Techno-economic Analysis Methods</div>
+              <div class="flex items-center gap-2 text-xs text-neutral-400"><iconify-icon icon="mdi:circle-small" class="text-rose-400"></iconify-icon>Ch 22: Life Cycle & Exergy Assessment</div>
+              <div class="flex items-center gap-2 text-xs text-neutral-400"><iconify-icon icon="mdi:circle-small" class="text-rose-400"></iconify-icon>Ch 23: Policy & Regulatory Frameworks</div>
+              <div class="flex items-center gap-2 text-xs text-neutral-400"><iconify-icon icon="mdi:circle-small" class="text-rose-400"></iconify-icon>Ch 24: Future Directions & Challenges</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Editors Section -->
+  <section id="editors" class="relative z-10 px-6 py-24">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-16 reveal">
+        <span class="inline-flex items-center gap-2 part-badge rounded-full px-4 py-1.5 text-xs font-medium text-indigo-300 mb-6">
+          <iconify-icon icon="mdi:account-tie" class="text-sm"></iconify-icon>
+          VOLUME EDITORS
+        </span>
+        <h2 class="text-3xl md:text-4xl font-semibold tracking-tight mb-4 gradient-text-2">Meet the Editors</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Editor 1 -->
+        <div class="reveal-card glass-panel rounded-2xl p-8 text-center topic-card" style="transition-delay: 0.1s;">
+          <div class="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-white/10 flex items-center justify-center mx-auto mb-5">
+            <iconify-icon icon="mdi:account" class="text-indigo-300 text-3xl"></iconify-icon>
+          </div>
+          <h3 class="text-lg font-semibold tracking-tight text-white mb-1">Dr. Imtiaz Ali</h3>
+          <p class="text-xs text-indigo-400 font-medium mb-3">Volume Editor</p>
+          <p class="text-xs text-neutral-500 leading-relaxed">Prince Mohammad Bin Fahd University</p>
+          <div class="mt-5 flex items-center justify-center gap-3">
+            <a href="#" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors">
+              <iconify-icon icon="mdi:email-outline" class="text-neutral-400 text-sm"></iconify-icon>
+            </a>
+            <a href="#" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors">
+              <iconify-icon icon="mdi:web" class="text-neutral-400 text-sm"></iconify-icon>
+            </a>
+            <a href="#" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors">
+              <iconify-icon icon="mdi:google" class="text-neutral-400 text-sm"></iconify-icon>
+            </a>
+          </div>
+        </div>
+
+        <!-- Editor 2 -->
+        <div class="reveal-card glass-panel rounded-2xl p-8 text-center topic-card" style="transition-delay: 0.2s;">
+          <div class="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-500/20 to-emerald-500/20 border border-white/10 flex items-center justify-center mx-auto mb-5">
+            <iconify-icon icon="mdi:account" class="text-cyan-300 text-3xl"></iconify-icon>
+          </div>
+          <h3 class="text-lg font-semibold tracking-tight text-white mb-1">Dr. Faizan Ahmed</h3>
+          <p class="text-xs text-cyan-400 font-medium mb-3">Volume Editor</p>
+          <p class="text-xs text-neutral-500 leading-relaxed">Prince Mohammad Bin Fahd University</p>
+          <div class="mt-5 flex items-center justify-center gap-3">
+            <a href="#" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors">
+              <iconify-icon icon="mdi:email-outline" class="text-neutral-400 text-sm"></iconify-icon>
+            </a>
+            <a href="#" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors">
+              <iconify-icon icon="mdi:web" class="text-neutral-400 text-sm"></iconify-icon>
+            </a>
+            <a href="#" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors">
+              <iconify-icon icon="mdi:google" class="text-neutral-400 text-sm"></iconify-icon>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Timeline Section -->
+  <section id="timeline" class="relative z-10 px-6 py-24">
+    <div class="max-w-3xl mx-auto">
+      <div class="text-center mb-16 reveal">
+        <span class="inline-flex items-center gap-2 part-badge rounded-full px-4 py-1.5 text-xs font-medium text-indigo-300 mb-6">
+          <iconify-icon icon="mdi:timeline-clock" class="text-sm"></iconify-icon>
+          IMPORTANT DATES
+        </span>
+        <h2 class="text-3xl md:text-4xl font-semibold tracking-tight mb-4 gradient-text-2">Timeline</h2>
+      </div>
+
+      <div class="relative">
+        <!-- Vertical Line -->
+        <div class="absolute left-6 md:left-8 top-0 bottom-0 w-px timeline-line"></div>
+
+        <!-- Timeline Items -->
+        <div class="space-y-8">
+          <!-- Item 1 -->
+          <div class="reveal flex gap-6 md:gap-8 items-start" style="transition-delay: 0.1s;">
+            <div class="relative z-10 flex-shrink-0 w-12 md:w-16 flex justify-center">
+              <div class="w-3 h-3 rounded-full bg-indigo-500 timeline-dot mt-1.5"></div>
+            </div>
+            <div class="glass-panel rounded-2xl p-6 flex-1 topic-card">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                <h4 class="text-sm font-semibold text-white">Call for Chapters Opens</h4>
+                <span class="text-xs font-medium text-indigo-400">January 2026</span>
+              </div>
+              <p class="text-xs text-neutral-500 leading-relaxed">Official announcement and invitation for abstract submissions across all six thematic areas.</p>
+            </div>
+          </div>
+
+          <!-- Item 2 -->
+          <div class="reveal flex gap-6 md:gap-8 items-start" style="transition-delay: 0.2s;">
+            <div class="relative z-10 flex-shrink-0 w-12 md:w-16 flex justify-center">
+              <div class="w-3 h-3 rounded-full bg-purple-500 timeline-dot mt-1.5"></div>
+            </div>
+            <div class="glass-panel rounded-2xl p-6 flex-1 topic-card border-l-2 border-l-amber-500/50">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                <h4 class="text-sm font-semibold text-white flex items-center gap-2">
+                  Abstract Submission Deadline
+                  <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                  </span>
+                </h4>
+                <span class="text-xs font-semibold text-amber-400">1 August 2026</span>
+              </div>
+              <p class="text-xs text-neutral-500 leading-relaxed">Submit a 300–500 word abstract including title, objectives, methodology, and expected contributions.</p>
+            </div>
+          </div>
+
+          <!-- Item 3 -->
+          <div class="reveal flex gap-6 md:gap-8 items-start" style="transition-delay: 0.3s;">
+            <div class="relative z-10 flex-shrink-0 w-12 md:w-16 flex justify-center">
+              <div class="w-3 h-3 rounded-full bg-cyan-500 timeline-dot mt-1.5"></div>
+            </div>
+            <div class="glass-panel rounded-2xl p-6 flex-1 topic-card">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                <h4 class="text-sm font-semibold text-white">Abstract Acceptance Notification</h4>
+                <span class="text-xs font-medium text-cyan-400">1 October 2026</span>
+              </div>
+              <p class="text-xs text-neutral-500 leading-relaxed">Authors notified of abstract acceptance and invited to submit full chapter manuscripts.</p>
+            </div>
+          </div>
+
+          <!-- Item 4 -->
+          <div class="reveal flex gap-6 md:gap-8 items-start" style="transition-delay: 0.4s;">
+            <div class="relative z-10 flex-shrink-0 w-12 md:w-16 flex justify-center">
+              <div class="w-3 h-3 rounded-full bg-emerald-500 timeline-dot mt-1.5"></div>
+            </div>
+            <div class="glass-panel rounded-2xl p-6 flex-1 topic-card">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                <h4 class="text-sm font-semibold text-white">Full Chapter Submission Deadline</h4>
+                <span class="text-xs font-medium text-emerald-400">1 March 2027</span>
+              </div>
+              <p class="text-xs text-neutral-500 leading-relaxed">Complete chapter manuscripts (8,000–9,000 words) due with all figures, tables, and references.</p>
+            </div>
+          </div>
+
+          <!-- Item 5 -->
+          <div class="reveal flex gap-6 md:gap-8 items-start" style="transition-delay: 0.5s;">
+            <div class="relative z-10 flex-shrink-0 w-12 md:w-16 flex justify-center">
+              <div class="w-3 h-3 rounded-full bg-rose-500 timeline-dot mt-1.5"></div>
+            </div>
+            <div class="glass-panel rounded-2xl p-6 flex-1 topic-card">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                <h4 class="text-sm font-semibold text-white">Peer Review & Revisions</h4>
+                <span class="text-xs font-medium text-rose-400">March – August 2027</span>
+              </div>
+              <p class="text-xs text-neutral-500 leading-relaxed">Double-blind peer review process with revision cycles and editorial feedback.</p>
+            </div>
+          </div>
+
+          <!-- Item 6 -->
+          <div class="reveal flex gap-6 md:gap-8 items-start" style="transition-delay: 0.6s;">
+            <div class="relative z-10 flex-shrink-0 w-12 md:w-16 flex justify-center">
+              <div class="w-3 h-3 rounded-full bg-amber-500 timeline-dot mt-1.5"></div>
+            </div>
+            <div class="glass-panel rounded-2xl p-6 flex-1 topic-card border-l-2 border-l-indigo-500/50">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                <h4 class="text-sm font-semibold text-white flex items-center gap-2">
+                  <iconify-icon icon="mdi:star" class="text-amber-400"></iconify-icon>
+                  Elsevier Global Publication
+                </h4>
+                <span class="text-xs font-semibold text-amber-400">December 2027</span>
+              </div>
+              <p class="text-xs text-neutral-500 leading-relaxed">Final publication as an Elsevier edited volume, available in print and digital formats worldwide.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Submission Guidelines -->
+  <section id="guidelines" class="relative z-10 px-6 py-24">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-16 reveal">
+        <span class="inline-flex items-center gap-2 part-badge rounded-full px-4 py-1.5 text-xs font-medium text-indigo-300 mb-6">
+          <iconify-icon icon="mdi:file-document-edit" class="text-sm"></iconify-icon>
+          SUBMISSION GUIDELINES
+        </span>
+        <h2 class="text-3xl md:text-4xl font-semibold tracking-tight mb-4 gradient-text-2">Chapter Requirements</h2>
+        <p class="text-sm font-light text-neutral-400 max-w-xl mx-auto leading-relaxed">
+          All chapters must follow Elsevier's formatting guidelines and meet the following requirements.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Left Column -->
+        <div class="space-y-4">
+          <div class="reveal-card glass-panel rounded-2xl p-6 req-item pl-6" style="transition-delay: 0.1s;">
+            <div class="flex items-center gap-3 mb-2">
+              <iconify-icon icon="mdi:text-long" class="text-indigo-400 text-lg"></iconify-icon>
+              <h4 class="text-sm font-semibold text-white">Chapter Length</h4>
+            </div>
+            <p class="text-xs text-neutral-400 leading-relaxed">8,000 – 9,000 words (inclusive of references, figures, and tables)</p>
+          </div>
+
+          <div class="reveal-card glass-panel rounded-2xl p-6 req-item pl-6" style="transition-delay: 0.15s;">
+            <div class="flex items-center gap-3 mb-2">
+              <iconify-icon icon="mdi:text-box-outline" class="text-purple-400 text-lg"></iconify-icon>
+              <h4 class="text-sm font-semibold text-white">Abstract</h4>
+            </div>
+            <p class="text-xs text-neutral-400 leading-relaxed">300 – 500 words covering objectives, methodology, key findings, and significance</p>
+          </div>
+
+          <div class="reveal-card glass-panel rounded-2xl p-6 req-item pl-6" style="transition-delay: 0.2s;">
+            <div class="flex items-center gap-3 mb-2">
+              <iconify-icon icon="mdi:image-multiple" class="text-cyan-400 text-lg"></iconify-icon>
+              <h4 class="text-sm font-semibold text-white">Figures & Tables</h4>
+            </div>
+            <p class="text-xs text-neutral-400 leading-relaxed">8 – 10 high-resolution figures/tables in editable format (vector preferred)</p>
+          </div>
+
+          <div class="reveal-card glass-panel rounded-2xl p-6 req-item pl-6" style="transition-delay: 0.25s;">
+            <div class="flex items-center gap-3 mb-2">
+              <iconify-icon icon="mdi:format-list-bulleted" class="text-emerald-400 text-lg"></iconify-icon>
+              <h4 class="text-sm font-semibold text-white">Keywords</h4>
+            </div>
+            <p class="text-xs text-neutral-400 leading-relaxed">5 – 8 relevant keywords for indexing and discoverability</p>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="space-y-4">
+          <div class="reveal-card glass-panel rounded-2xl p-6 req-item pl-6" style="transition-delay: 0.3s;">
+            <div class="flex items-center gap-3 mb-2">
+              <iconify-icon icon="mdi:format-font" class="text-amber-400 text-lg"></iconify-icon>
+              <h4 class="text-sm font-semibold text-white">Formatting</h4>
+            </div>
+            <p class="text-xs text-neutral-400 leading-relaxed">MS Word / LaTeX, Elsevier house style, double-spaced, numbered sections</p>
+          </div>
+
+          <div class="reveal-card glass-panel rounded-2xl p-6 req-item pl-6" style="transition-delay: 0.35s;">
+            <div class="flex items-center gap-3 mb-2">
+              <iconify-icon icon="mdi:book-open-variant" class="text-rose-400 text-lg"></iconify-icon>
+              <h4 class="text-sm font-semibold text-white">References</h4>
+            </div>
+            <p class="text-xs text-neutral-400 leading-relaxed">APA / numbered style, recent publications (last 10 years), cross-referenced in text</p>
+          </div>
+
+          <div class="reveal-card glass-panel rounded-2xl p-6 req-item pl-6" style="transition-delay: 0.4s;">
+            <div class="flex items-center gap-3 mb-2">
+              <iconify-icon icon="mdi:shield-check" class="text-indigo-400 text-lg"></iconify-icon>
+              <h4 class="text-sm font-semibold text-white">Originality</h4>
+            </div>
+            <p class="text-xs text-neutral-400 leading-relaxed">Original, unpublished work. Plagiarism check via iThenticate (≤15% similarity)</p>
+          </div>
+
+          <div class="reveal-card glass-panel rounded-2xl p-6 req-item pl-6" style="transition-delay: 0.45s;">
+            <div class="flex items-center gap-3 mb-2">
+              <iconify-icon icon="mdi:account-check" class="text-purple-400 text-lg"></iconify-icon>
+              <h4 class="text-sm font-semibold text-white">Authorship</h4>
+            </div>
+            <p class="text-xs text-neutral-400 leading-relaxed">Multi-institutional and international collaborations are strongly encouraged</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section id="submit" class="relative z-10 px-6 py-32">
+    <div class="max-w-3xl mx-auto text-center">
+      <div class="reveal">
+        <div class="glass-panel rounded-3xl p-10 md:p-16 relative overflow-hidden">
+          <!-- Background decoration -->
+          <div class="absolute -top-20 -right-20 w-60 h-60 bg-indigo-600/10 rounded-full blur-[80px]"></div>
+          <div class="absolute -bottom-20 -left-20 w-60 h-60 bg-purple-600/10 rounded-full blur-[80px]"></div>
+
+          <div class="relative z-10">
+            <iconify-icon icon="mdi:water-check" class="text-indigo-400 text-5xl mb-6"></iconify-icon>
+            <h2 class="text-3xl md:text-4xl font-semibold tracking-tight mb-4 gradient-text-2">Ready to Contribute?</h2>
+            <p class="text-sm font-light text-neutral-400 max-w-lg mx-auto leading-relaxed mb-8">
+              We especially welcome interdisciplinary and international contributions that advance the future of sustainable water technologies. Submit your abstract by <strong class="text-amber-400 font-medium">1 August 2026</strong>.
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <button onclick="showToast('Abstract submission portal opening January 2026. Contact editors for early expressions of interest.')" class="cta-btn text-sm font-medium px-8 py-3.5 rounded-full flex items-center gap-2">
+                <iconify-icon icon="mdi:send" class="text-base"></iconify-icon>
+                Submit Abstract
+              </button>
+              <button onclick="copyEmail()" class="cta-btn-outline text-sm font-medium px-8 py-3.5 rounded-full flex items-center gap-2">
+                <iconify-icon icon="mdi:email-outline" class="text-base"></iconify-icon>
+                Contact Editors
+              </button>
+            </div>
+
+            <div class="mt-8 flex items-center justify-center gap-6 text-xs text-neutral-500">
+              <span class="flex items-center gap-1.5"><iconify-icon icon="mdi:check-circle" class="text-emerald-500"></iconify-icon> Double-blind Review</span>
+              <span class="flex items-center gap-1.5"><iconify-icon icon="mdi:check-circle" class="text-emerald-500"></iconify-icon> Scopus Indexed</span>
+              <span class="flex items-center gap-1.5"><iconify-icon icon="mdi:check-circle" class="text-emerald-500"></iconify-icon> Global Release</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="relative z-10 border-t border-white/5 px-6 py-12">
+    <div class="max-w-6xl mx-auto">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-3">
+          <iconify-icon icon="mdi:water" class="text-indigo-400 text-xl"></iconify-icon>
+          <div>
+            <p class="text-sm font-semibold tracking-tight">Smart & Circular Desalination Systems</p>
+            <p class="text-xs text-neutral-500">Elsevier Edited Volume</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-6 text-xs text-neutral-500">
+          <span>Prince Mohammad Bin Fahd University</span>
+          <span class="hidden md:inline">•</span>
+          <span>© 2025 All Rights Reserved</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <span class="text-xs text-neutral-600 mr-2">Share:</span>
+          <button onclick="shareOnTwitter()" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors">
+            <iconify-icon icon="mdi:twitter" class="text-neutral-400 text-sm"></iconify-icon>
+          </button>
+          <button onclick="shareOnLinkedIn()" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors">
+            <iconify-icon icon="mdi:linkedin" class="text-neutral-400 text-sm"></iconify-icon>
+          </button>
+          <button onclick="shareOnEmail()" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors">
+            <iconify-icon icon="mdi:email-variant" class="text-neutral-400 text-sm"></iconify-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast">
+    <div class="glass-panel rounded-2xl px-6 py-4 flex items-center gap-3 max-w-sm" style="box-shadow: 0 0 30px rgba(0,0,0,0.5);">
+      <iconify-icon icon="mdi:information" class="text-indigo-400 text-xl flex-shrink-0"></iconify-icon>
+      <p id="toast-message" class="text-xs text-neutral-300 leading-relaxed"></p>
+    </div>
+  </div>
+
+  <script>
+    // Spotlight Effect
+    document.addEventListener('mousemove', (e) => {
+      document.getElementById('spotlight').style.setProperty('--x', e.clientX + 'px');
+      document.getElementById('spotlight').style.setProperty('--y', e.clientY + 'px');
+    });
+
+    // Scroll Reveal
+    const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.reveal, .reveal-card').forEach(el => observer.observe(el));
+
+    // Toast
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      const msg = document.getElementById('toast-message');
+      msg.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 4000);
+    }
+
+    // Copy Email
+    function copyEmail() {
+      showToast('Editor contact details will be shared upon abstract portal launch. Please check back in January 2026.');
+    }
+
+    // Share functions
+    function shareOnTwitter() {
+      const text = '🚨 Call for Chapters: Smart and Circular Desalination Systems (Elsevier). Submit abstracts by 1 Aug 2026! #Desalination #WaterTech #Elsevier';
+      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    function shareOnLinkedIn() {
+      const url = window.location.href;
+      window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank');
+    }
+
+    function shareOnEmail() {
+      const subject = 'Call for Chapters: Smart and Circular Desalination Systems (Elsevier)';
+      const body = 'Dear Colleague,\n\nYou may be interested in this Call for Chapters for an Elsevier edited volume on "Smart and Circular Desalination Systems: Digital Innovation, Renewable Integration, and Resource Recovery."\n\nAbstract Deadline: 1 August 2026\nPublication: December 2027\n\nEditors: Dr. Imtiaz Ali & Dr. Faizan Ahmed\nPrince Mohammad Bin Fahd University';
+      window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    }
+
+    // Smooth scroll for nav links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
